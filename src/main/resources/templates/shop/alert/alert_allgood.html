@@ -1,0 +1,53 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<script src="/js/jquery-1.12.4.js"></script>
+<div id="allgood">
+    <p style="color:red;" th:if="not ${#strings.isEmpty(tip)}" th:text="${tip}"></p>
+    <table th:if="${#strings.isEmpty(tip)}" border="1" style="text-align: center;">
+        <tr>
+            <th>商品id</th>
+            <th>商品名称</th>
+            <th>商品品牌</th>
+            <th>商品介绍</th>
+            <th>商品价格</th>
+            <th>商品数量</th>
+            <th>商品重量</th>
+            <th>商品产地</th>
+            <th>商品状态</th>
+            <th>操作</th>
+        </tr>
+        <tr th:each="good:${goods}">
+            <td th:text="${good.goodid}"></td>
+            <td th:text="${good.goodname}"></td>
+            <td th:text="${good.brand}"></td>
+            <td th:text="${good.introduce}"></td>
+            <td th:text="${good.price}"></td>
+            <td th:text="${good.goodnumber}"></td>
+            <td th:text="${good.weight}"></td>
+            <td th:text="${good.address}"></td>
+            <td id="goodSwitch"><span th:if="${good.status}==1">上架</span><span th:if="${good.status}==0">下架</span>
+            <span th:if="${good.status}==2">违规下架</span></td>
+            <td>
+                <!--
+                <form th:action="@{/shop/business/editGood/}+${good.goodid}" method="get">
+                    <input type="hidden" name="edit" value="edit">
+                    <button type="submit">编辑信息</button>
+                </form>
+                -->
+                <!--
+                 plan A:
+                 信息隐藏到input中
+                 businuess #rightbar 监听编辑按钮
+                 获取信息 添加到url中 #rightbar.load(html)
+                -->
+                <!--<a th:href="@{alert/alert_good.html(goodid=${good.goodid},goodname=${good.goodname},brand=${good.brand},introduce=${good.introduce},price=${good.price},goodnumber=${good.goodnumber},goodweight=${good.weight},address=${good.address},status=${good.status})}">编辑信息</a>-->
+                <!--整个页面跳转 不合适-->
+                <button class="editGood" th:id="${good.goodid}" th:attr="goodid=${good.goodid},goodname=${good.goodname},brand=${good.brand},introduce=${good.introduce},price=${good.price},goodnumber=${good.goodnumber},goodweight=${good.weight},address=${good.address},image=${good.image},status=${good.status}">编辑商品</button>
+                <form th:action="@{/shop/business/deleteGood/}+${good.goodid}" method="post">
+                    <input type="hidden" name="delete" value="delete">
+                    <input type="submit" value="删除商品">
+                </form>
+            </td>
+
+        </tr>
+    </table>
+</div>

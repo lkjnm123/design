@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>订单详细信息</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    .mainpage{
+        width:1200px;
+        margin:0 auto;
+        height:auto;
+    }
+</style>
+<body>
+<div class="mainpage">
+    <div class="header">
+        <img class="logoimg" id="logoimg" th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+    </div>
+    <div class="middle" th:each="orderShow:${orderShows}">
+        <div class="gooditem" style="border:1px solid #EEEEEE;">
+            <img th:src="${orderShow.goodimage}" style="width: 100px;height: 100px;">
+            <p th:text="${orderShow.goodname}"></p>
+            <p><span>×</span><span th:text="${orderShow.buynumber}"></span></p>
+            <p style="display: inline;vertical-align: top;" th:text="${orderShow.createtime}"></p>
+            <p style="display: inline;vertical-align: top;" th:text="${orderShow.shopname}"></p>
+            <p style="display: inline;vertical-align: top;">
+                <span th:if="${orderShow.goodstatus}==0">待发货</span>
+                <span th:if="${orderShow.goodstatus}==1">运输中</span>
+                <span th:if="${orderShow.goodstatus}==2">配送中</span>
+                <span th:if="${orderShow.goodstatus}==3">待评价</span>
+                <span th:if="${orderShow.goodstatus}==4">已完成</span>
+                <span th:if="${orderShow.goodstatus}==9">未付款取消订单</span>
+            </p>
+        </div>
+    </div>
+    <div class="side">
+        <!-- //TODO 收货地址信息-->
+    </div>
+
+</div>
+</body>
+</html>

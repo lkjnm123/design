@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>商城首页</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<link href="/css/index.css" rel="stylesheet" type="text/css"/>
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    $(function(){
+        $.ajax({
+            url:"/client/customer/randomgood",
+            type:"post",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success:function(data,status){
+                $.each(data,function(index,goodView){
+                    var $item = "<div class=\"itemgood\" style=\"width:232px;height:300px;display:inline-block;border:1px solid #EEEEEE;\">\n" +
+                        "                    <a href=\"goodinfo?goodid="+goodView.goodid+"\"><img src=\""+goodView.goodimage+"\" style=\"width:232px;height:auto;display:block\"></a>\n" +
+                        "                        <p style=\"margin-top:5px;width:232px;text-align:left; font-size: 12px;display: block;\">\n" +
+                        "                        <a href=\"goodinfo?goodid="+goodView.goodid+"\">"+goodView.goodname+"</a></p>\n" +
+                        "                        <p style=\"color:#E1251B;display: block;\">\n" +
+                        "                        <a style=\"color:#E1251B;\" href=\"goodinfo?goodid="+goodView.goodid+"\">"+goodView.goodprice+"</a></p>\n" +
+                        "                    </div>";
+                    $("#randomGood").append($item);
+                });
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+        $(".gotocart").click(function(){
+            $.ajax({
+                url:"/client/customer/cartlist",
+                type:"post",
+                contentType: "application/json;charset=UTF-8",
+                //前往购物车请求不需要发送数据
+                dataType: "html",
+                success:function(data,status){
+
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+    });
+</script>
+<body>
+<div class="mainpage" id="mainpage">
+    <div class="header" id="header">
+        <a th:if="${#strings.isEmpty(session.loginUser)}" href="register.html">免费注册</a>
+        <form th:if="not ${#strings.isEmpty(session.loginUser)}" method="post" th:action="@{/logout}">
+            <input type="hidden" value="logout">
+            <input type="submit" value="退出登录" style="cursor:pointer;border:0;background-color: transparent">
+        </form>
+        <span>&nbsp;&nbsp;</span>
+        <a th:if="${#strings.isEmpty(session.loginUser)}" href="signin.html">您好，请登录</a>
+        <a th:if="${session.identity} eq 'customer'" th:text="${session.loginUser}" href="./client/profile.html"></a>
+        <a th:if="${session.identity} eq 'business'" th:text="${session.loginUser}" href="./shop/business.html"></a>
+    </div>
+    <div class="searchbox" id="searchbox">
+        <img class="logoimg" id="logoimg" th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+        <div class="searchinput" id="searchinput">
+            <form th:action="@{/searchgood}" method="get">
+                <input name="keyname" id="searchgood" placeholder="请输入要搜索的商品">
+                <button type="submit"></button>
+            </form>
+        </div>
+        <div id="mycart" style="border: 1px solid #5F6368; width:191px; height: 50px;position:relative;margin-left: 80%;margin-top: -55px;">
+            <form th:action="@{/client/customer/cartlist}" method="get">
+                <button type="submit" style="cursor:pointer;border:0;background-color: transparent; position: absolute;top: 50%;left:50%;transform: translateY(-50%) translateX(-50%);">我的购物车</button>
+            </form>
+        </div>
+    </div>
+    <div class="middle" id="middle">
+        <div class="leftbar" id="leftbar">
+            <ul>
+                <li><span>家用电器</span></li>
+                <li><span>手机</span> / <span>运营商</span> / <span>数码</span></li>
+                <li><span>电脑</span> / <span>办公</span></li>
+                <li><span>家居</span> / <span>家具</span> / <span>家装</span> / <span>厨具</span></li>
+                <li><span>男装</span> / <span>女装</span> / <span>童装</span> / <span>内衣</span></li>
+                <li><span>美妆</span> / <span>个护清洁</span> / <span>宠物</span></li>
+                <li><span>女鞋</span> / <span>箱包</span> / <span>钟表</span> / <span>珠宝</span></li>
+                <li><span>男鞋</span> / <span>运动</span> / <span>户外</span></li>
+                <li><span>房产</span> / <span>汽车</span> / <span>汽车用品</span></li>
+                <li><span>母婴</span> / <span>玩具乐器</span></li>
+                <li><span>食品</span> / <span>酒类</span> / <span>生鲜</span> / <span>特产</span></li>
+                <li><span>艺术</span> / <span>礼品鲜花</span> / <span>农资绿植</span></li>
+                <li><span>医药保健</span> / <span>计生情趣</span></li>
+                <li><span>图书</span> / <span>文娱</span> / <span>教育</span> / <span>电子书</span></li>
+                <li><span>机票</span> / <span>酒店</span> / <span>旅游</span> / <span>生活</span></li>
+                <li><span>理财</span> / <span>众筹</span> / <span>白条</span> / <span>保险</span></li>
+                <li><span>安装</span> / <span>维修</span> / <span>清洗</span> / <span>二手</span></li>
+                <li><span>工业品</span></li>
+            </ul>
+        </div>
+        <div class="rightbar" id="rightbar">
+            <img th:src="@{/images/picture02.jpg}">
+        </div>
+        <div class="homepageitem">
+                <div id="randomGood" style="float:left;">
+                    <!--//TODO 随机展示商品 频繁查库 优化方法-->
+                </div>
+        </div>
+    </div>
+    <div class="footer" id="footer">
+        <hr>
+        <div style="float: right;">
+            <p style="display: inline;"><a href="about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>购物车</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<link href="/css/cart.css" rel="stylesheet" type="text/css">
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    $(function () {
+        $(".goodnumber input").each(function(){
+            //初始页面 遍历检查禁用按钮
+            if($(this).val()==1){
+                $(this).prev().attr("disabled","true");
+            }
+            if($(this).val()==99){
+                $(this).next().attr("disabled","true");
+            }
+            //初始页面 遍历生成并填充商品小计
+            var goodnumber = $(this).val();
+            var unitprice = $(this).parent().prev().text();
+            var subtotal = goodnumber*unitprice;
+            $(this).parent().next().text(subtotal.toFixed(2));
+        });
+        $(".goodstatus").each(function(){
+            var status_text = $(this).children("span").text();
+            if(status_text==="有货"){
+                $(this).addClass("insock");
+            }
+            if(status_text==="无货"){
+                $(this).addClass("outofsock");
+            }
+            if(status_text==="下架"){
+                $(this).addClass("off");
+            }
+            if(status_text==="店铺关闭"){
+                $(this).addClass("shutdown");
+            }
+            if(status_text==="商品违规"){
+                $(this).addClass("break");
+            }
+
+        });
+        $(".goodstatus").each(function(){
+            //初始页面 根据商品状态检查是否可选中
+            if(!$(this).hasClass("insock")){
+                //无货则禁用按钮
+                $(this).prev().children("input").attr("disabled","disabled");
+            }
+        });
+        $(".goodnumber input").on("input propertychange", function () {
+            //用户自行输入情况 判断检查
+            if ($(this).val() <= 1) {
+                $(this).prev().attr("disabled", "true");
+            } else {
+                $(this).prev().removeAttr("disabled");
+            }
+            if ($(this).val() >= 99) {
+                $(this).next().attr("disabled", "true");
+            } else {
+                $(this).next().removeAttr("disabled");
+            }
+            //修改小计
+            var goodnumber = $(this).val();
+            var unitprice = $(this).parent().prev().text();
+            var subtotal = goodnumber*unitprice;
+            $(this).parent().next().text(subtotal.toFixed(2));
+        });
+        $(".btn-reduce").click(function () {
+            $(this).next().next().removeAttr("disabled"); //点击减少按钮 激活增加按钮
+            var current_number = $(this).next().val();
+            current_number -= 1;
+            //触发禁用
+            if(current_number<=1){
+                current_number = 1;
+                $(this).attr("disabled","true");
+            }
+            //修改input
+            $(this).next().val(current_number);
+            //修改小计
+            var unitprice = $(this).parent().prev().text();
+            var subtotal = current_number*unitprice;
+            $(this).parent().next().text(subtotal.toFixed(2));
+        });
+        $(".btn-increase").click(function () {
+            $(this).prev().prev().removeAttr("disabled"); //点击增加按钮 激活减少按钮
+            var current_number = $(this).prev().val();
+            current_number = current_number - 0 + 1;
+            //触发禁用
+            if(current_number>=99){
+                current_number = 99;
+                $(this).attr("disabled","true");
+            }
+            //修改input
+            $(this).prev().val(current_number);
+            //修改小计
+            var unitprice = $(this).parent().prev().text();
+            var subtotal = current_number*unitprice;
+            $(this).parent().next().text(subtotal.toFixed(2));
+        });
+        //设置数量和价格参数
+        var goodnubmertotal = 0;
+        var pricetotal = 0;
+        //监听选中复选框 改变<tr>条目颜色
+        $(".input_check").on("click",function(){
+            var itemnumber = $(this).parent().next().next().next().children("input").val();
+            var itemprice = $(this).parent().next().next().next().next().text();
+            if($(this).is(':checked')==true){
+                pricetotal = pricetotal.toFixed(2);  //避免出现0.000000000000001的情况 每次修改时修正价格总数统计
+                $(this).parent().parent().css("background","#FFF4E8");
+                goodnubmertotal = goodnubmertotal - 0 + parseInt(itemnumber);
+                pricetotal = pricetotal -0+ parseFloat(itemprice);
+                $("#goodnumbertotal").text(goodnubmertotal);
+                $("#goodpricetotal").text(pricetotal.toFixed(2));
+            }else{
+                pricetotal = pricetotal.toFixed(2);  //避免出现0.000000000000001的情况 每次修改时修正价格总数统计
+                $(this).parent().parent().css("background","#FFFFFF");
+                goodnubmertotal -= itemnumber;
+                pricetotal -= itemprice;
+                $("#goodnumbertotal").text(goodnubmertotal);
+                $("#goodpricetotal").text(pricetotal.toFixed(2));
+            }
+        });
+        //button按钮都同时添加事件 难以确定this和获取值
+        //增加和修改触发统计框数量和总价变化
+        $(".btn-reduce").on("click",function(){
+            if($(this).parent().prev().prev().prev().children("input").is(':checked')==true){
+                //确定该商品条目被选中 增加和减少对统计框的修改有效
+                //减一操作
+                pricetotal = pricetotal.toFixed(2);  //避免出现0.000000000000001的情况 每次修改时修正价格总数统计
+                var unititemprice = $(this).parent().prev().text();
+                goodnubmertotal -= 1;
+                pricetotal -= unititemprice;
+                $("#goodnumbertotal").text(goodnubmertotal);
+                $("#goodpricetotal").text(pricetotal.toFixed(2));
+            }
+        });
+        $(".btn-increase").on("click",function(){
+            if($(this).parent().prev().prev().prev().children("input").is(':checked')==true){
+                //确定该商品条目被选中 增加和减少对统计框的修改有效
+                //加一操作
+                pricetotal = pricetotal.toFixed(2);  //避免出现0.000000000000001的情况 每次修改时修正价格总数统计
+                var unititemprice = $(this).parent().prev().text();
+                goodnubmertotal = goodnubmertotal -0+ 1;
+                pricetotal = pricetotal -0+ parseFloat(unititemprice);
+                $("#goodnumbertotal").text(goodnubmertotal);
+                $("#goodpricetotal").text(pricetotal.toFixed(2));
+            }
+        });
+        //全选按钮
+        $("#selectAll").on("click",function(){
+            if($(this).is(":checked")==true){
+                $(".gooditem").each(function(){
+                    if($(this).children("input").is(":checked")==false){
+                        $(this).children("input").trigger("click");
+                    }                });
+                $(this).next().text("全不选");
+            }else{
+                $(".gooditem").each(function(){
+                    if($(this).children("input").is(":checked")==true){
+                        $(this).children("input").trigger("click");
+                    }
+                });
+                $(this).next().text("全选");
+            }
+        });
+
+        $(".op_delete").on("click",function(){
+            var goodid = $(this).attr("goodid");
+            var gooditem = $(this).parent().parent();
+            $.ajax({
+                type:'post',
+                url:'/deleteCartItem',
+                contentType: "application/json;charset=UTF-8",
+                data:JSON.stringify({"goodid":goodid}),
+                dataType: "json",
+                success:function(data,status){
+                    if(data.msg==="success"){
+                        gooditem.remove();
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        $("#settleaccount").on("click",function(){
+            var goodidlist = new Array();
+            var goodnumber = new Array();
+            $(".input_check").each(function(){
+                //遍历获取已被选中的商品
+                if($(this).is(":checked")==true){
+                    goodidlist.push($(this).attr("goodid"));
+                    goodnumber.push($(this).parent().next().next().next().children("input").val());
+                }
+            });
+            if(goodidlist.length==0){
+                return false;
+            }
+            $("#goodidlist").val(goodidlist);
+            console.log($("#goodidlist").val());
+            $("#numberlist").val(goodnumber);
+            return true;
+            /*
+            $.ajax({
+                type:'get',
+                url:'/goToSettlement',
+                contentType: "application/json;charset=UTF-8",
+                traditional: true,
+                data: {
+                    "goodidlist": goodidlist,
+                    "numberlist": goodnumber
+                },
+                success:function(data,status){
+                    $(window).attr("location","/client/alert/alert_settlement");
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+            */
+        });
+    });
+</script>
+
+<body>
+<div class="mainpage">
+    <div id="header">
+        <img th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+        <div class="info" id="info">
+            <a style="display: inline;" class="homepage" id="homepage" href="../../index.html">返回首页</a> | <form style="display: inline;" method="post" th:action="@{/logout}">
+            <input type="hidden" value="logout">
+            <input type="submit" value="退出登录" style="cursor:pointer;border:0;background-color: transparent">
+        </form> | <a style="display: inline;"
+                class="contact" id="contact" href="../profile.html">个人信息</a>
+        </div>
+    </div>
+    <div id="middle">
+        <div>
+            <table border="1" width="100%">
+                <tr>
+                    <th width="60%">商品</th>
+                    <th width="5%">状态</th>
+                    <th width="10%">单价</th>
+                    <th width="10%">数量</th>
+                    <th width="10%">小计</th>
+                    <th width="5%">操作</th>
+                </tr>
+                <tr style="height:auto;" th:each="good:${goodViews}">
+                    <td class="gooditem" >
+                        <input type="checkbox" name="itemselect" class="input_check" style="cursor:pointer;display: inline;text-align: center;" th:attr="goodid=${good.goodid}" >
+                        <a th:href="@{/goodinfo(goodid=${good.goodid})}"><img th:src="${good.goodimage}" style="display:inline;height:80px;width:80px;vertical-align: middle;"></a>
+                        <!--//TODO 同一店铺商品集中展示-->
+                        <a th:href="@{/goodinfo(goodid=${good.goodid})}"><span class="goodname" style="display:inline;vertical-align: top;" th:text="${good.goodname}"></span></a>
+                        <span style="display:inline;vertical-align: top;">|</span>
+                        <a th:href="@{/shopinfo(shopid=${good.shopid})}"><span class="goodshop" style="display:inline;vertical-align: top;" th:text="${good.shopname}"></span></a>
+                    </td>
+                    <td class="goodstatus" ><span th:if="${good.status}==1">有货</span>
+                        <span th:if="${good.status}==0">无货</span>
+                        <span th:if="${good.status}==2">下架</span>
+                        <span th:if="${good.status}==3">店铺关闭</span>
+                        <span th:if="${good.status}==4">商品违规</span></td>
+                    <!--//1 代表有货 0代表无货 2代表卖家自行下架 3代表卖家店铺关闭 4代表管理员关闭 -->
+                    <!--// insock有货 outofsock无货 off下架 shutdown店铺关闭 break违规下架 -->
+                    <td class="unitprice" th:text="${good.goodprice}"></td>
+                    <td class="goodnumber">
+                        <button class="btn-reduce" style="width: 15px;">-</button>
+                        <input type="number" class="input_goodnumber" oninput="if(value>99)value=99;if(value<1)value=1;" value="1"
+                               style="width:50%;text-align:center;vertical-align:middle;">
+                        <button class="btn-increase" style="width: 15px;">+</button>
+                    </td>
+                    <td class="subtotal"></td>
+                    <!-- @{/deleteCartItem(goodid=${good.goodid})} ?传参 @RequestParam接收 /{}路径传参 @PathVariable 接收 -->
+                    <!-- //为了解删除结果，弃用a标签th:href 改为使用ajax请求 -->
+                    <td class="operation">
+                        <!--<a th:href="@{'/deleteCartItem/'+${good.goodid}}" class="op_delete" th:attr="goodid=${good.goodid}">删除</a>-->
+                        <span class="op_delete" th:attr="goodid=${good.goodid}">删除</span>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+        <div id="settlement" style="clear: both;margin-top:20px;width:100%;height:26px; border: 1px dotted #000;">
+            <div id="settleleft" style="display:inline;float: left;">
+                <input type="checkbox" id="selectAll" style="cursor:pointer;display: inline;">
+                <span>全选</span>
+            </div>
+            <div id="settleright" style="display:inline;float: right;">
+                <span>已选择&nbsp;<span id="goodnumbertotal"></span>&nbsp;件商品</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span>总价:&nbsp;<span id="goodpricetotal"></span>&nbsp;</span>&nbsp;&nbsp;&nbsp;
+                <form th:action="@{/goToSettlement}" method="post" style="float:right">
+                    <input type="hidden" name="goodidlist" id="goodidlist">
+                    <input type="hidden" name="numberlist" id="numberlist">
+                    <button type="submit" id="settleaccount" style="width:47px;height: 26px;background-color: #E64347;color: #FFF;" >去结算</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div id="footer">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="../about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+
+</html>

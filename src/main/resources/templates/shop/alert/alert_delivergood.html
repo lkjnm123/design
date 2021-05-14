@@ -1,0 +1,57 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    a:hover{
+        color: red;
+    }
+</style>
+<body>
+<div class="mainpage" style="width:auto;">
+    <div class="content">
+        <table border="1" style="width:100%;text-align: center;">
+            <tr>
+                <th style="width:10%;">创建时间</th>
+                <th style="width:10%;">订单编号</th>
+                <th style="width:10%;">商品名称</th>
+                <th style="width:10%;">购买数量</th>
+                <th style="width:10%;">顾客名称</th>
+                <th style="width:10%;">收货地址</th>
+                <th style="width:10%;">商品状态</th>
+                <th style="width:10%;">操作</th>
+            </tr>
+            <tr th:each="deliverGood:${deliverGoods}">
+                <td th:text="${deliverGood.createdate}"></td>
+                <td th:text="${deliverGood.ordernumber}"></td>
+                <td th:text="${deliverGood.goodname}"></td>
+                <td th:text="${deliverGood.goodnumber}"></td>
+                <td th:text="${deliverGood.buyer}"></td>
+                <td th:text="${deliverGood.address}"></td>
+                <td>
+                    <span th:if="${deliverGood.goodstatus==0}">待发货</span>
+                    <span th:if="${deliverGood.goodstatus==1}">运输中</span>
+                    <span th:if="${deliverGood.goodstatus==2}">配送中</span>
+                    <span th:if="${deliverGood.goodstatus==3}">已签收</span>
+                    <span th:if="${deliverGood.goodstatus==4}">待评价</span>
+                </td>
+                <!--//TODO 根据商品状态动态调整select中的option内容-->
+                <td>
+                    <select>
+                        <option value="1">运输中</option>
+                        <option value="2">配送中</option>
+                        <option value="9">取消订单</option>
+                    </select>
+                    <button class="saveOperation" th:attr="orderitemid=${deliverGood.order_item_id}">保存</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

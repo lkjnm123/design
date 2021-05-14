@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>待评价商品</title>
+</head>
+<body>
+    <div>
+        <table border="1" style="text-align: center;width: 100%;">
+            <tr>
+                <th>购买时间</th>
+                <th>订单编号</th>
+                <th>店铺名称</th>
+                <th>商品名称</th>
+                <th>购买数量</th>
+                <th>操作</th>
+            </tr>
+            <tr th:each="order:${ToBeReviewGoods}">
+                <td th:text="${order.date}"></td>
+                <td th:text="${order.ordernumber}"></td>
+                <td th:text="${order.shopname}"></td>
+                <th th:text="${order.goodname}"></th>
+                <th th:text="${order.buynumber}"></th>
+                <th><button th:attr="ordercustomerid=${order.ordercustomerid},shopname=${order.shopname},goodname=${order.goodname}" class="gotoreviews">去评价</button></th>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

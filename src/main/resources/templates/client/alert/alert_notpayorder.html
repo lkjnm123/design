@@ -1,0 +1,43 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    a:hover{
+        color: red;
+    }
+</style>
+<body>
+<div class="mainpage" style="width:auto;">
+    <div class="content">
+        <table border="1" style="text-align: center;width:100%;">
+            <tr>
+                <th style="width: 10%;">创建时间</th>
+                <th style="width: 40%;">订单编号</th>
+                <!--//TODO 订单包含商品列表显示-->
+                <th style="width: 30%;">订单金额</th>
+                <th style="width: 20%">操作</th>
+            </tr>
+            <tr th:each="initialOrder:${initialOrders}">
+                <td th:text="${initialOrder.create_time}"></td>
+                <td th:text="${initialOrder.order_number}"></td>
+                <td th:text="${initialOrder.order_amount}"></td>
+                <td>
+                    <button class="cancelOrder" th:attr="ordernumber=${initialOrder.order_number}" style="width:60px;display: inline;">取消订单</button>
+                    <form th:action="@{/client/customer/resumeOrder}" method="post" style="display: inline;">
+                        <input type="hidden" name="ordernumber" th:value="${initialOrder.order_number}">
+                        <input type="hidden" name="price" th:value="${initialOrder.order_amount}">
+                        <input type="submit" value="去支付" style="width:60px;">
+                    </form>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,77 @@
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+a {
+    text-decoration: none;
+    color:black;
+}
+
+.info {
+    float: right;
+}
+
+.mainpage {
+    width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+#middle {
+    height: 800px;
+}
+
+.input_goodnumber::-webkit-outer-spin-button,
+.input_goodnumber::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.input_goodnumber[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.unitprice,
+.goodnumber,
+.subtotal,
+.operation,
+.goodstatus{
+    text-align: center;
+}
+
+.goodname:hover,
+.goodshop:hover,
+.op_delete:hover{
+    color:red;
+    cursor: pointer;
+}
+
+.insock{
+    color:green;
+}
+.outofsock{
+    color:red;
+}
+.off{
+    color:gray;
+}
+.shutdown{
+    color:black;
+}
+.break{
+    color:yellow;
+}
+#footer {
+    display: block;
+    text-align: center;
+    bottom: 10px;
+    left: 50%;
+    height: 30px;
+    margin-top: 10px;
+}

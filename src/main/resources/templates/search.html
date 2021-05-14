@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>搜索商品页面</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<link href="/css/search.css" rel="stylesheet" type="text/css">
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    $(function () {
+        $(".addToCart").click(function () {
+            var cartitemid = "0";
+            var thisbutton = $(this);
+            var goodid = $(this).attr("goodid");
+            console.log("添加" + goodid + "到购物车");
+            $.ajax({
+                url: "/client/customer/addcart",
+                type: "post",
+                contentType: "application/json;charset=UTF-8",
+                data: JSON.stringify({
+                    "cartitemid": cartitemid,
+                    "goodid": goodid
+                }),
+                dataType: "json",
+                success: function (data, status) {
+                    if (data.msg === "success") {
+                        alert("添加到购物车成功");
+                        thisbutton.text("已在购物车中");
+                        thisbutton.prop("disabled", "disabled");
+                    } else {
+                        alert("添加到购物车失败");
+                    }
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        });
+    });
+    window.onload = function () {
+        //遍历检查 禁用按钮
+        $(".addToCart span").each(function () {
+            if ($(this).text() === "已在购物车中") {
+                $(this).parent().prop("disabled", "disabled");
+            }
+        });
+    }
+</script>
+<body>
+<div class="mainpage">
+    <div id="header">
+        <div id="searchbox">
+            <div class="container">
+                <div id="seeCart">
+                    <a th:href="@{/client/customer/cartlist}">我的购物车</a>
+                    <br>
+                    <a href="./index.html">返回首页</a>
+                </div>
+                <form th:action="@{/searchgood}" method="post">
+                    <input type="text" name="keyname" id="keyname">
+                    <input type="submit" value="搜索" id="submit_keyname">
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="middle">
+        <!--
+        //TODO 商品分页
+        //TODO 搜索得到的商品列表 按照价格区间、销量、新品进行排序
+        -->
+        <div class="gooditem" th:each="good:${goodViews}">
+            <a th:href="@{/goodinfo(goodid=${good.goodid})}"><img th:src="${good.goodimage}"
+                                                                  th:attr="goodid=${good.goodid}"
+                                                                  style="width: 232px;height: auto;"></a>
+            <p><a style="color:black;" th:text="${good.goodprice}" th:href="@{/goodinfo(goodid=${good.goodid})}"></a>
+            </p>
+            <p><a style="color:black;" th:text="${good.goodname}" th:href="@{/goodinfo(goodid=${good.goodid})}"></a></p>
+            <p><a style="color:black;" th:text="${good.shopname}" th:href="@{/shopinfo(shopid=${good.shopid})}"></a></p>
+            <!-- //TODO 店铺页面-->
+            <button class="addToCart" th:attr="goodid=${good.goodid}"><span class="cart_status"
+                                                                            th:if="${good.getStatus()}==1">添加到购物车</span><span
+                    class="cart_status" th:if="${good.getStatus()}==0">已在购物车中</span></button>
+        </div>
+    </div>
+    <div id="footer">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+</html>

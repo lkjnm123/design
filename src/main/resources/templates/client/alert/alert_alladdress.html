@@ -1,0 +1,25 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<div id="alladdress">
+    <table border="1">
+        <tr>
+            <th>地址编号</th>
+            <th>收货人姓名</th>
+            <th>收货人手机号</th>
+            <th>收货人地址</th>
+            <th>操作</th>
+        </tr>
+        <tr th:each="address:${addresses}">
+            <td th:text="${address.addressid}"></td>
+            <td th:text="${address.realname}"></td>
+            <td th:text="${address.phonenumber}"></td>
+            <td th:text="${address.address}"></td>
+            <td>
+                <button class="editAddress" th:id="${address.addressid}" th:attr="addressid=${address.addressid},realname=${address.realname},phonenumber=${address.phonenumber},address=${address.address}">编辑地址</button>
+                <form th:action="@{/client/customer/deleteaddress/}+${address.addressid}" method="post">
+                    <input type="hidden" name="delete" value="delete">
+                    <input type="submit" value="删除地址">
+                </form>
+            </td>
+        </tr>
+    </table>
+</div>

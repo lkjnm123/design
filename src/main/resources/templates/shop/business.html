@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>商家页面</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<link href="/css/business.css" rel="stylesheet" type="text/css"/>
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    function editShop(){
+        var shopName = $.trim($("#input_shopname").val());
+        var shopIntroduce  = $("#input_shopintroduce").val();
+        var shopState = $("#input_shopstate").val();
+        $.ajax({
+            url:"/shop/business/addShop",
+            type:"post",
+            contentType:"application/json;charset=UTF-8",
+            data:JSON.stringify({"shopname":shopName,"shopintroduce":shopIntroduce,"shopstatus":shopState}),
+            dataType:"json",
+            success:function(data,status){
+                console.log(data.msg);
+                if(data.msg=="success"){
+                    alert("创建店铺成功")
+                }else{
+                    alert("创建店铺失败");
+                }
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+    }
+    function showallshop(){
+        $.ajax({
+            url:"/shop/business/showallshop",
+            type:"get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "html",
+            success:function(data,status){
+                console.log("加载店铺请求成功");
+                //var shop_content = $(data).find("#allshop").html();
+                //可能非完整html页面无法使用jQuery find函数
+                //console.log(data);
+                $("#rightbar").html(data);
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+    }
+    function uploadimage(){
+        var formData = new FormData();
+        formData.append("file",$("#input_file")[0].files[0]);
+        $.ajax({
+            url:"/shop/business/uploadimage",
+            type:"post",
+            cache:false,
+            data:formData,
+            processData: false,
+            contentType: false,
+            success:function(data,status){
+                $("#upload_result").html(data.msg);
+                $("#image_url").val(data.imageurl);
+                $("#input_preview").attr("src",data.imageurl);
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+    }
+    function addGood(){
+        var goodid=$("#input_goodid").val();
+        var goodname = $("#input_goodname").val();
+        var brand = $("#input_brand").val();
+        var introduce = $("#input_introduce").val();
+        var price = $("#input_price").val();
+        var goodnumber = $("#input_goodnumber").val();
+        var weight = $("#input_weight").val();
+        var address = $("#input_address").val();
+        var state = $("#input_goodstate").val();
+        var image = $("#image_url").val();
+        $.ajax({
+           url:"/shop/business/addGood",
+           type:"post",
+           contentType:"application/json;charset=UTF-8",
+           dataType:"json",
+           data:JSON.stringify({"goodid":goodid,"goodname":goodname,"brand":brand,"introduce":introduce,"price":price,"goodnumber":goodnumber,"weight":weight,"address":address,"image":image,"state": state}),
+            success:function(data,status){
+                alert(data.msg);
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+    }
+    function showallgood(){
+        $.ajax({
+            url:"/shop/business/showallgood",
+            type:"get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "html",
+            success:function(data,status){
+                console.log("加载商品列表请求成功");
+                $("#rightbar").html(data);
+            },
+            error:function(status){
+                alert(status);
+            }
+        });
+    }
+    $(function () {
+        $("#createshop").click(function(){
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_shop.html");
+            /*
+            $("#rightbar").on("click","#sure_addShop",function(){
+                editShop();
+            });
+            */
+            $("#rightbar").on("click",".cancel,.ok",function(){
+                $("#rightbar").empty();
+            });
+        });
+        $("#showallshop").click(function(){
+            $("#rightbar").empty();
+            showallshop();
+        });
+        $("#rightbar").delegate(".editShop","click",function(){
+            var businessid = $(this).attr("shopid");
+            var shopname = $(this).attr("shopname");
+            var introduce = $(this).attr("introduce");
+            var status = $(this).attr("introduce");
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_shop.html",function(){
+                $("#input_shopid").val(businessid);
+                $("#input_shopname").val(shopname);
+                $("#input_shopintroduce").val(introduce);
+                //$("#input_shopstate").eq(status).prop("selected",'selected');
+                $("#input_shopstate option[value=status]").prop("selected","selected");
+            });
+        });
+        $("#rightbar").on("click","#sure_addShop",function(){
+            editShop();
+            $("#rightbar").empty();
+        });
+
+        //#rightbar load 其他html页面 直接监听id无效
+        /*
+        $("#input_file").change(function(){
+            console.log("change image");
+            uploadimage();
+        });
+         */
+        $("#rightbar").on("change","#input_file",function(){
+            uploadimage();
+        });
+
+        $("#addgood").click(function(){
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_good.html");
+            /*
+            $("#rightbar").on("click","#sure_addGood",function(){
+                addGood(); //添加商品 //里外重复监听 导致重复发送请求
+            });
+             */
+            $("#rightbar").on("click",".cancel,.ok",function(){
+               $("#rightbar").empty();
+            });
+        });
+        $("#rightbar").on("click","#sure_addGood",function(){
+            addGood(); //添加商品
+            $("#rightbar").empty();
+        });
+
+        $("#goodlist").click(function(){
+            $("#rightbar").empty();
+            showallgood();
+        });
+        $("#rightbar").delegate(".editGood","click",function(){
+            //编辑商品功能
+            var goodid = $(this).attr("id");
+            console.log($(this).attr("goodname"));
+            var goodname = $(this).attr("goodname");
+            var brand = $(this).attr("brand");
+            var introduce = $(this).attr("introduce");
+            var price = $(this).attr("price");
+            var goodnumber = $(this).attr("goodnumber");
+            var goodweight = $(this).attr("goodweight");
+            var address = $(this).attr("address");
+            var image = $(this).attr("image");
+            var status = $(this).attr("status");
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_good.html",function(){
+                $("#input_goodid").val(goodid);
+                $("#input_goodname").val(goodname);
+                $("#input_brand").val(brand);
+                $("#input_introduce").val(introduce);
+                $("#input_price").val(price);
+                $("#input_goodnumber").val(goodnumber);
+                $("#input_weight").val(goodweight);
+                $("#input_address").val(address);
+                $("#input_preview").attr("src",image);
+                $("#image_url").val(image);
+                //$("#input_goodstate").eq(status).prop("selected",'selected');
+                $("#input_goodstate option[value=status]").prop("selected","selected");
+            });
+        });
+        //为商家加载商品订单
+        $("#tobedeliver").click(function(){
+            $.ajax({
+                type:'post',
+                url:'/shop/business/tobedeliver',
+                contentType: "application/json;charset=UTF-8",
+                dataType: "html",
+                success:function(data,status){
+                    $("#rightbar").empty();
+                    $("#rightbar").html(data);
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        $("#rightbar").delegate(".saveOperation","click",function(){
+            var selectVal = $(this).prev().val();
+            var selectText = $(this).prev().find("option:selected").text();
+            var itemstatus = $(this).parent().prev();
+            var orderitemid = $(this).attr("orderitemid");
+            $.ajax({
+                type:'post',
+                url:'/shop/business/changeOrderItemStatus',
+                data:JSON.stringify({"val":selectVal,"orderitemid":orderitemid}),
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success:function(data,status){
+                    if(data.msg==="success"){
+                        itemstatus.text(selectText);
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        //添加修改密码功能
+        $("#editpwd").click(function(){
+            $("#rightbar").empty();
+            var data = "<div id=\"editpassword\">\n" +
+                "    <form>\n" +
+                "        <input style=\"display: block;\" type=\"text\" name=\"oldpassword\" id=\"oldpassword\" placeholder=\"原密码\" required>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"password\" name=\"newpassword\" id=\"newpassword\" placeholder=\"新密码\" required>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"password\" name=\"confirmpassword\" id=\"confirmpassword\" placeholder=\"确认新密码\"\n" +
+                "            required>\n" +
+                "        <p id=\"checkwarn\"></p>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"submit\" class=\"submit-btn\" value=\"提交\">\n" +
+                "    </form>\n" +
+                "</div>";
+            $("#rightbar").html(data);
+        });
+        //TODO 加密功能
+        $("#rightbar").delegate("#confirmpassword","propertychange input",function(){
+            var $one = $("#newpassword").val();
+            var $two = $("#confirmpassword").val();
+            if ($one != $two) {
+                $("#checkwarn").html("前后密码不一致");
+                $(".submit-btn").prop("disabled", true);
+            }else{
+                $("#checkwarn").html("");
+                $(".submit-btn").prop("disabled", false);
+            }
+        });
+        $("#rightbar").on("click",".submit-btn",function(){
+            var $oldpwd = $("#oldpassword").val();
+            var $newpwd = $("#newpassword").val();
+            $.ajax({
+                type: 'post',
+                url: '/client/business/editPassword',
+                data:JSON.stringify({"oldpwd":$oldpwd,"newpwd":$newpwd}),
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success:function(data,status){
+                    if(data.msg=="success"){
+                        $("#rightbar").empty();
+                        alert("密码修改成功");
+                    }else{
+                        $("#oldpassword").val("");
+                        alert("原密码不正确");
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+            return false;
+        });
+    });
+</script>
+<body>
+<div class="mainpage" id="mainpage">
+    <div class="header" id="header">
+        <img th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+        <div class="info" id="info">
+            <a style="display: inline;" class="homepage" id="homepage" href="../index.html">返回首页</a> | <form style="display:inline;" method="post" th:action="@{/logout}">
+            <input type="hidden" value="logout">
+            <input type="submit" value="退出登录" style="cursor:pointer;border:0;background-color: transparent">
+        </form> | <a style="display: inline;"
+                class="contact" id="contact" href="./business.html">个人信息</a>
+        </div>
+    </div>
+    <hr>
+    <div class="middle" id="middle">
+        <div class="leftbar" id="leftbar">
+            <div id="shop" class="shop">
+                <p>个人信息</p>
+                <ul>
+                    <li id="createshop">创建店铺</li>
+                    <li id="showallshop">店铺管理</li>
+                    <li id="editpwd">修改密码</li>
+                </ul>
+            </div>
+            <div id="good" class="good">
+                <p>商品管理</p>
+                <ul>
+                    <li id="goodlist">商品列表</li>
+                    <li id="addgood">添加商品</li>
+                </ul>
+            </div>
+            <div id="order" class="good">
+                <p>订单管理</p>
+                <ul>
+                    <li id="orderlist">订单列表</li>
+                    <li id="tobedeliver">待完成</li>
+                </ul>
+            </div>
+            <div id="aftersale" class="good">
+                <p>售后管理</p>
+                <ul>
+                    <li>订单退款</li>
+                </ul>
+            </div>
+        </div>
+        <div id="rightbar" name="rightbar">
+
+        </div>
+    </div>
+    <hr>
+    <div class="footer" id="footer">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="../about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+
+</html>

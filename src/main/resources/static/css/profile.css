@@ -1,0 +1,68 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+html,body{
+    height: 100%;
+}
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    color: red;
+}
+
+.info {
+    float: right;
+}
+.mainpage {
+    width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+.leftbar,.rightbar{
+    float: left;
+}
+#rightbar{
+    margin-left: 10px;
+    margin-top:10px;
+    background-color:powderblue;
+    height:auto;
+    min-height: 600px;
+    width: 87%;
+    border: 1px solid #000;
+    margin-bottom:10px;
+}
+#profile,
+#order,
+#address {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 100px;
+    height: auto;
+    line-height: 40px;
+    text-align: left;
+    background-color:rgb(47, 226, 158);
+}
+#profile>ul,
+#order>ul,
+#address>ul{
+    list-style: none;
+    text-align: right;
+}
+ul>li{
+    cursor: pointer;
+}
+#footer {
+    clear: both;
+    display: block;
+    text-align: center;
+    bottom: 10px;
+    left: 50%;
+    height:30px;
+    margin-top: 10px;
+}

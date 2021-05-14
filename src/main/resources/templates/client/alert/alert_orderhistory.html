@@ -1,0 +1,49 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    a:hover{
+        color: red;
+    }
+</style>
+<body>
+<div class="mainpage" style="width:auto;">
+    <div class="content">
+        <table border="1" style="text-align: center;width:100%;">
+            <tr>
+                <th style="width:10%;">创建时间</th>
+                <th style="width:40%;">订单编号</th>
+                <!--//TODO 订单包含商品列表显示-->
+                <th style="width:30%;">订单金额</th>
+                <th style="width:20%;">操作</th>
+            </tr>
+            <tr th:each="order:${orderHistory}">
+                <td th:text="${order.create_time}"></td>
+                <td><a th:href="@{/client/customer/orderInfo(ordernumber=${order.order_number})} ">
+                    <span th:text="${order.order_number}"></span>
+                </a></td>
+                <td th:text="${order.order_amount}"></td>
+                <td th:if="${order.trade_status==0&&order.pay_status==0}">
+                    <button class="cancelOrder" style="width:60px;display: inline;" th:attr="ordernumber=${order.order_number}">取消订单</button>
+                    <form th:action="@{/client/customer/resumeOrder}" method="post" style="display: inline;">
+                        <input type="hidden" name="ordernumber" th:value="${order.order_number}">
+                        <input type="hidden" name="price" th:value="${order.order_amount}">
+                        <input type="submit" value="去支付" style="width:60px;">
+                    </form>
+                </td>
+                <td th:if="${order.trade_status==2}">已取消</td>
+                <td th:if="${order.trade_status==1}">已完成</td>
+                <td th:if="${order.pay_status==1&&order.trade_status==0}">已支付</td>
+                <td th:if="${order.pay_status==2}">已退款</td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人资料界面</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<link rel="stylesheet" href="/css/profile.css" type="text/css">
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    function editaddress() {
+        var addressid = $("#input_addressid").val();
+        var realname = $.trim($("#input_realname").val());
+        var phonenumber = $("#input_phonenumber").val();
+        var address = $("#input_address").val();
+        $.ajax({
+            url: "/client/customer/addaddress",
+            type: "post",
+            contentType: "application/json;charset=UTF-8",
+            data: JSON.stringify({
+                "addressid": addressid,
+                "realname": realname,
+                "phonenumber": phonenumber,
+                "address": address
+            }),
+            dataType: "json",
+            success: function (data, status) {
+                console.log(data.msg);
+                if (data.msg === "success") {
+                    alert("编辑地址成功")
+                } else {
+                    alert("编辑地址失败");
+                }
+            },
+            error: function (status) {
+                alert(status);
+            }
+        });
+    }
+
+    function showaddresslist() {
+        $.ajax({
+            url: "/client/customer/addresslist",
+            type: "get",
+            contentType: "application/json;charset=UTF-8",
+            dataType: "html",
+            success: function (data, status) {
+                console.log("加载地址列表请求成功");
+                $("#rightbar").html(data);
+            },
+            error: function (status) {
+                alert(status);
+            }
+        });
+    }
+
+    $(function () {
+        $("#addaddress").click(function () {
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_address.html");
+            $("#rightbar").on("click", ".cancel,.ok", function () {
+                $("#rightbar").empty();
+            });
+        });
+
+        $("#addresslist").click(function () {
+            $("#rightbar").empty();
+            showaddresslist();
+        });
+
+        $("#rightbar").delegate(".editAddress", "click", function () {
+            var addressid = $(this).attr("addressid");
+            var realname = $(this).attr("realname");
+            var phonenumber = $(this).attr("phonenumber");
+            var address = $(this).attr("address");
+            $("#rightbar").empty();
+            $("#rightbar").load("alert/alert_address.html", function () {
+                $("#input_addressid").val(addressid);
+                $("#input_realname").val(realname);
+                $("#input_phonenumber").val(phonenumber);
+                $("#input_address").val(address);
+            });
+        });
+
+        $("#rightbar").on("click", "#sure_addAddress", function () {
+            editaddress();
+            $("#rightbar").empty();
+        });
+
+        $("#notpay").click(function () {
+            $.ajax({
+                type: 'get',
+                url: '/client/customer/nopayorder',
+                contentType: "application/json;charset=UTF-8",
+                dataType: "html",
+                success: function (data, status) {
+                    $("#rightbar").empty();
+                    $("#rightbar").html(data);
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        });
+        $("#rightbar").on("click", ".cancelOrder", function () {
+            var toEditTd = $(this).parent();
+            var ordernumber = $(this).attr("ordernumber");
+            $.ajax({
+                type: 'post',
+                url: '/client/customer/cancelOrder',
+                contentType: 'application/json;charset=UTF-8',
+                data: JSON.stringify({"ordernumber": ordernumber}),
+                dataType: 'json',
+                success: function (data, status) {
+                    if (data.msg === "success") {
+                        toEditTd.empty();
+                        toEditTd.text("已取消");
+                    }
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        });
+        //确认收货功能
+        $("#rightbar").on("click",".confirmReceipt",function(){
+            var toEditStatus = $(this).parent().prev().children("span");
+            var orderitemid = $(this).attr("orderitemid");
+            var toEditButton = $(this);
+            $.ajax({
+                type: 'post',
+                url: '/client/customer/confirmReceipt',
+                contentType: "application/json;charset=UTF-8",
+                data:JSON.stringify({"orderitemid":orderitemid}),
+                dataType: "json",
+                success:function(data,status){
+                    if(data.msg==="success"){
+                        toEditStatus.text("待评价");
+                        toEditButton.text("去评价");
+                        toEditButton.removeClass("confirmReceipt");
+                        toEditButton.addClass("toEvaluate");
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        //收货商品列表 去评价功能
+        $("#rightbar").on("click",".toEvaluate",function(){
+            $("#rightbar").empty();
+            var ordercustomerid = $(this).attr("ordercustomerid");
+            var goodname = $(this).attr("goodname");
+            var shopname = $(this).attr("shopname");
+            var comment_input = "<div id=\"evaluation\" style=\"width: auto;\">\n" +
+                "    <form>\n" +
+                "        <span>商品名称:</span><span id=\"goodname\">"+goodname+"</span>\n" +
+                "        <br>\n" +
+                "        <span>店铺名称:</span><span id=\"shopname\">"+shopname+"</span>\n" +
+                "        <br>\n" +
+                "        <input type=\"hidden\" name=\"ordercustomerid\" id=\"hidden-ordercustomerid\" value="+ordercustomerid+">\n" +
+                "        <span>评价:</span>\n" +
+                "        <textarea id=\"comment\" cols=\"40\" rows=\"10\" autofocus>\n" +
+                "        </textarea>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"submit\" class=\"comment-submit-btn\" value=\"提交\">\n" +
+                "    </form>\n" +
+                "</div>";
+            $("#rightbar").html(comment_input);
+        });
+
+        $("#paidorder").click(function () {
+            $.ajax({
+                type: 'get',
+                url: '/client/customer/tobereceived',
+                contentType: "application/json;charset=UTF-8",
+                dataType: "html",
+                success: function (data, status) {
+                    $("#rightbar").empty();
+                    $("#rightbar").html(data);
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        });
+        $("#rightbar").on("click",".refund",function(){
+            var $ordernumber = $(this).attr("outordernumber");
+            var $goodstatus = $(this).parent().prev().children("span");
+            var $thisbutton = $(this);
+
+            $.ajax({
+                type:'post',
+                url:'/client/refund',
+                contentType:'application/json;charset=UTF-8',
+                dataType:'json',
+                data:JSON.stringify({"ordernumber":$ordernumber}),
+                success:function(data,status){
+                    alert(data.msg);
+                    $thisbutton.remove();
+                    $goodstatus.text("已退款");
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        $("#orderlist").click(function(){
+            $.ajax({
+                type: 'post',
+                url: '/client/customer/orderHistory',
+                contentType: "application/json;charset=UTF-8",
+                dataType: "html",
+                success: function (data, status) {
+                    $("#rightbar").empty();
+                    $("#rightbar").html(data);
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        });
+        //添加修改密码功能
+        $("#editpwd").click(function(){
+            $("#rightbar").empty();
+            var data = "<div id=\"editpassword\">\n" +
+                "    <form>\n" +
+                "        <input style=\"display: block;\" type=\"text\" name=\"oldpassword\" id=\"oldpassword\" placeholder=\"原密码\" required>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"password\" name=\"newpassword\" id=\"newpassword\" placeholder=\"新密码\" required>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"password\" name=\"confirmpassword\" id=\"confirmpassword\" placeholder=\"确认新密码\"\n" +
+                "            required>\n" +
+                "        <p id=\"checkwarn\"></p>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"submit\" class=\"submit-btn\" value=\"提交\">\n" +
+                "    </form>\n" +
+                "</div>";
+            $("#rightbar").html(data);
+        });
+        //TODO 加密功能
+        $("#rightbar").delegate("#confirmpassword","propertychange input",function(){
+            var $one = $("#newpassword").val();
+            var $two = $("#confirmpassword").val();
+            if ($one != $two) {
+                $("#checkwarn").html("前后密码不一致");
+                $(".submit-btn").prop("disabled", true);
+            }else{
+                $("#checkwarn").html("");
+                $(".submit-btn").prop("disabled", false);
+            }
+        });
+        $("#rightbar").on("click",".submit-btn",function(){
+            var $oldpwd = $("#oldpassword").val();
+            var $newpwd = $("#newpassword").val();
+            $.ajax({
+                type: 'post',
+                url: '/client/customer/editPassword',
+                data:JSON.stringify({"oldpwd":$oldpwd,"newpwd":$newpwd}),
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success:function(data,status){
+                    if(data.msg=="success"){
+                        $("#rightbar").empty();
+                        alert("密码修改成功");
+                    }else{
+                        $("#oldpassword").val("");
+                        alert("原密码不正确");
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+            return false;
+        });
+        //添加已购商品评价功能
+        $("#goodevaluation").click(function(){
+            $("#rightbar").empty();
+            $.ajax({
+                type:'post',
+                url:'/client/customer/goodreviewlist',
+                dataType:'html',
+                contentType:'application/json;charset=UTF-8',
+                success:function(data,status){
+                    $("#rightbar").html(data);
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+        });
+        $("#rightbar").on("click",".gotoreviews",function(){
+            $("#rightbar").empty();
+            var goodname = $(this).attr("goodname");
+            var shopname = $(this).attr("shopname");
+            var ordercustomerid = $(this).attr("ordercustomerid");
+            var comment_input = "<div id=\"evaluation\" style=\"width: auto;\">\n" +
+                "    <form>\n" +
+                "        <span>商品名称:</span><span id=\"goodname\">"+goodname+"</span>\n" +
+                "        <br>\n" +
+                "        <span>店铺名称:</span><span id=\"shopname\">"+shopname+"</span>\n" +
+                "        <br>\n" +
+                "        <input type=\"hidden\" name=\"ordercustomerid\" id=\"hidden-ordercustomerid\" value="+ordercustomerid+">\n" +
+                "        <span>评语:</span>\n" +
+                "        <textarea id=\"comment\" cols=\"40\" rows=\"10\" autofocus>\n" +
+                "        </textarea>\n" +
+                "        <br>\n" +
+                "        <input style=\"display: block;\" type=\"submit\" class=\"comment-submit-btn\" value=\"提交\">\n" +
+                "    </form>\n" +
+                "</div>";
+            $("#rightbar").html(comment_input);
+        });
+        $("#rightbar").on("click",".comment-submit-btn",function(){
+            var $ordercustomerid = $("#hidden-ordercustomerid").val();
+            var $comment = $("#comment").val();
+            $.ajax({
+                type:'post',
+                url:'/client/customer/submitcomment',
+                data:JSON.stringify({"comment":$comment,"ordercustomerid":$ordercustomerid}),
+                contentType: "application/json;charset=UTF-8",
+                dataType: "json",
+                success:function(data,status){
+                    console.log(data.msg);
+                    if(data.msg=="success"){
+                        $("#rightbar").empty();
+                        alert("商品评论提交成功");
+                    }
+                    if(data.msg=="fail1"){
+                        alert("商品评论提交失败");
+                    }
+                    if(data.msg=="fail2"){
+                        //TODO 提交评论成功 修改商品状态失败 重新提交评论恢复功能
+                        alert("修改商品状态出现错误，稍后重试");
+                    }
+                },
+                error:function(status){
+                    alert(status);
+                }
+            });
+            return false;
+        });
+    });
+</script>
+<body>
+<div class="mainpage">
+    <div class="header" id="header">
+        <img th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+        <div class="info" id="info">
+            <a style="display: inline;" class="homepage" id="homepage" href="../index.html">返回首页</a> | <form style="display: inline;" method="post" th:action="@{/logout}">
+            <input type="hidden" value="logout">
+            <input type="submit" value="退出登录" style="cursor:pointer;border:0;background-color: transparent">
+        </form> | <a style="display: inline;"
+                class="contact" id="contact" href="./profile.html">个人信息</a>
+        </div>
+    </div>
+    <hr>
+    <div id="middle" class="middle">
+        <div class="leftbar" id="leftbar">
+            <div id="profile" class="profile">
+                <p>个人信息</p>
+                <ul>
+                    <!-- <li id="editusername">修改用户名</li> -->
+                    <li id="editpwd">修改密码</li>
+                    <!-- <li id="editphonenumber">修改手机号</li> -->
+                    <!-- <li id="editEvaluation">修改评论</li> -->
+                </ul>
+            </div>
+            <div id="order" class="order">
+                <p>订单列表</p>
+                <ul>
+                    <li id="notpay">待付款</li>
+                    <li id="paidorder">已付款</li>
+                    <li id="goodevaluation">待评价</li>
+                    <!-- <li id="refund">退款售后</li> -->
+                    <li id="orderlist">历史订单</li>
+                </ul>
+            </div>
+
+            <div id="address" class="address">
+                <p>地址管理</p>
+                <ul>
+                    <li id="addaddress">添加地址</li>
+                    <li id="addresslist">地址列表</li>
+                </ul>
+            </div>
+        </div>
+        <div id="rightbar" class="rightbar">
+
+        </div>
+    </div>
+    <div id="footer">
+        <hr>
+        <div style="float: right;">
+            <p style="display: inline;"><a href="../about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+</html>

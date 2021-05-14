@@ -1,0 +1,20 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+</script>
+<div id="allshop">
+    <table border="1">
+        <tr>
+            <th>店铺名称</th>
+            <th>店铺介绍</th>
+            <th>店铺状态</th>
+            <th>店铺操作</th>
+        </tr>
+        <tr th:each="shop:${shops}">
+            <td th:text="${shop.shopname}"></td>
+            <td th:text="${shop.introduce}"></td>
+            <td id="shopSwitch"><span th:if="${shop.status}==1">开启</span><span th:unless="${shop.status}==1">关闭</span></td>
+            <td><button class="editShop" th:id="${shop.id}" th:attr="shopid=${shop.id},shopname=${shop.shopname},introduce=${shop.introduce},status=${shop.status}">编辑信息</button></td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>订单结算页</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        text-decoration: none;
+        color: black;
+    }
+
+    .mainpage {
+        width: 1200px;
+        margin: 0 auto;
+        height: auto;
+        border: 1px solid #EEEEEE;
+        border-top: none;
+        border-bottom: none;
+    }
+
+    .info {
+        float: right;
+    }
+
+    .middle{
+        height:auto!important;
+        height: 550px;
+        min-height: 550px;
+    }
+
+    .footer {
+        display: block;
+        text-align: center;
+        bottom: 10px;
+        left: 50%;
+        height: 30px;
+        margin-top: 10px;
+    }
+</style>
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    $(function(){
+        $("#goPay").on("click",function(){
+            //id number
+            var idlist = new Array();
+            var numberlist = new Array();
+            $(".goodid").each(function(){
+                idlist.push($(this).text());
+                numberlist.push($(this).parent().next().next().next().children(".goodnumber").text());
+            });
+            if(idlist.length===0||numberlist.length===0){
+                return false;
+            }
+            $("#goodidlist").val(idlist);
+            $("#numberlist").val(numberlist);
+            $("#address_context").val($("#address_selector").val());
+            return true;
+        });
+    });
+</script>
+<body>
+<div class="mainpage">
+    <div id="header" style="position: relative;">
+        <img th:src="@{/images/e-commerce_transparent.png}" width="150px" height="150px">
+        <h1 style="display: inline;color:#C09B4B;position:absolute;left: 15%;top:50%">结算页</h1>
+        <div class="info" id="info">
+            <a style="display: inline;" class="homepage" id="homepage" href="../../index.html">返回首页</a> | <form style="display: inline;" method="post" th:action="@{/logout}">
+            <input type="hidden" value="logout">
+            <input type="submit" value="退出登录" style="cursor:pointer;border:0;background-color: transparent">
+        </form> | <a style="display: inline;"
+                class="contact" id="contact" href="../profile.html">个人信息</a>
+        </div>
+    </div>
+    <hr color="#EEEEEE" size="1px">
+    <div class="middle" style="clear:both">
+        <p>核对订单信息</p>
+        <div id="consignee" style="margin-left: 5%; margin-top:1%;">
+            <p>收货人信息</p>
+            <select id="address_selector">
+                <option th:each="address:${addresses}" th:value="${address.addressid}" th:text="${address.address}"></option>
+            </select>
+            <p style="float: right;display: inline;color:#005EA7;cursor: pointer;" onclick="alert('请到个人信息页面编辑')">新增收货人信息</p>
+            <br>
+            <p style="color:red;" th:if="${addresses.size()}==0">请添加收货地址信息</p>
+        </div>
+        <hr style="border:none;border-top:1px solid #EEEEEE">
+        <div id="payment" style="margin-left: 5%;clear:both;margin-top: 20px;">
+            <p>支付方式</p>
+            <select>
+                <option>支付宝</option>
+            </select>
+            <p style="float: right;display: inline;color:#005EA7;cursor: pointer;" onclick="javascript:history.back(-1);">返回购物车修改</p>
+        </div>
+        <hr style="border:none;border-top:1px solid #EEEEEE">
+        <div class="goodlist" style="margin-top: 20px;">
+            <div class="gooditem" style="margin-left: 5%;margin-right: 5%; background-color: #F3FBFE;" th:each="goodView:${goodViews}">
+                <img th:src="${goodView.goodimage}" class="goodimage" style="width:80px;height:80px;display: inline;" >
+                <p style="display: none"><span class="goodid" th:text="${goodView.goodid}"></span></p>
+                <p style="display: inline;vertical-align: top;"><span class="goodname" th:text="${goodView.goodname}"></span></p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <p style="display: inline;vertical-align: top;"><span class="goodprice" th:text="${goodView.goodprice}"></span></p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <p style="display: inline;vertical-align: top;"><span>×</span><span class="goodnumber" th:text="${goodView.status}"></span></p>
+            </div>
+        </div>
+        <hr style="border:none;border-top:1px solid #EEEEEE">
+        <div id="totalbar">
+            <p style="float: right;display:block;"><span id="totalnumber" style="color:#E4393C;font-size: 5px;" th:text="${numbers}"></span><span style="font-size: 5px;">件商品，总商品金额:</span>&nbsp;&nbsp;&nbsp;&nbsp;<span id="totalprice" style="font-size: 5px;" th:text="${payprice}"></span></p>
+            <br>
+            <p style="float: right;display:block;">运费&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+            <br>
+            <br>
+            <p style="float: right;display: block;">应付总额:&nbsp;&nbsp;&nbsp;<span style="color:#E4393C;">￥</span><span id="payprice" style="color:#E4393C;" th:text="${payprice}"></span></p>
+            <br>
+            <br>
+            <form th:action="@{/goPay}" style="float:right" method="post" th:if="${addresses.size()}!=0">
+                <!--@RequestParam Integer[] goodidlist,@RequestParam Integer[] numberlist -->
+                <input type="hidden" name="goodidlist" id="goodidlist">
+                <input type="hidden" name="numberlist" id="numberlist">
+                <input type="hidden" name="consignee" id="address_context">
+                <button type="submit" id="goPay" style="float: right; display:block;background-color: #E4393C;color:#FFF;width:100px;height:40px;border:0;border-radius: 3px;">提交订单</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer" style="clear: both;">
+        <hr color="#EEEEEE">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="../about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+</body>
+
+</html>

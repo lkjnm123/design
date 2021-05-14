@@ -1,0 +1,103 @@
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<script src="/js/jquery-1.12.4.js"></script>
+<style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #good_main {
+        height: auto;
+        width: 600px;
+        margin-left: 10%;
+    }
+
+    .item {
+        margin-bottom: 5px;
+    }
+
+    #good_foot {
+        float: right;
+    }
+    #good_body{
+        float: left;
+    }
+    #image-item{
+        float: left;
+    }
+
+</style>
+<script>
+    function getQueryString(key){
+        var reg = new RegExp("(^|&)"+key+"=([^&]*)(&|$)");
+        var result = window.location.search.substr(1).match(reg);
+        return result?decodeURIComponent(result[2]):null;
+    }
+    var goodid=getQueryString("goodid");
+    var goodname=getQueryString("goodname");
+    var brand=getQueryString("brand");
+    var introduce=getQueryString("introduce");
+    var price=getQueryString("price");
+    var goodnumber=getQueryString("goodnumber");
+    var goodweight=getQueryString("goodweight");
+    var address=getQueryString("address");
+    var status=getQueryString("status");
+</script>
+<div id="good_main">
+    <div id="good_header">
+        <h4>添加商品</h4>
+    </div>
+    <div id="good_body">
+        <input type="hidden" name="goodid" id="input_goodid" value="0">
+        <div class="item">
+            <span>名称:</span>
+            <input type="text" name="goodname" required="" autofocus id="input_goodname" placeholder="请输入商品名称(必填)">
+        </div>
+        <div class="item">
+            <span>品牌:</span>
+            <input type="text" name="brand" id="input_brand" placeholder="请输入商品品牌(非必填)">
+        </div>
+        <div class="item">
+            <span>介绍:</span>
+            <textarea type="text" name="introduce" rows="7" cols="20" id="input_introduce"
+                      placeholder="请输入商品介绍(非必填)"></textarea>
+        </div>
+        <div class="item">
+            <span>价格:</span>
+            <input type="number" name="price" required="" id="input_price" min="0.00" max="1000000.00" step="0.01" placeholder="请输入商品价格(必填)">
+        </div>
+        <div class="item">
+            <span>数量:</span>
+            <input type="number" name="goodnumber" required="" id="input_goodnumber" min="0" max="99999" step="1" placeholder="请输入商品数量">
+        </div>
+        <div class="item">
+            <span>重量:</span>
+            <input type="text" name="weight" required="" id="input_weight" placeholder="请输入商品重量(必填)">
+        </div>
+        <div class="item">
+            <span>产地:</span>
+            <input type="text" name="address" required="" id="input_address" placeholder="请输入商品产地(必填)">
+        </div>
+        <div class="item">
+            <span>商品图片:</span>
+            <input type="file" name="file" id="input_file" accept="image/gif,image/jpeg,image/jpg,image/png,image/svg" placeholder="上传商品图片(非必填)">
+            <input type="hidden" name="image_url" id="image_url">
+            <span name="upload_result" id="upload_result"></span>
+        </div>
+        <div class="item">
+            <span>商品状态:</span>
+            <select name="goodstate" id="input_goodstate">
+                <option value="1">上架</option>
+                <option value="0">下架</option>
+            </select>
+        </div>
+        <div id="good_foot">
+            <button class="cancel">取消</button>
+            <button class="ok" id="sure_addGood">保存</button>
+        </div>
+    </div>
+    <div id="image-item">
+        <img src="" id="input_preview" name="input_preview" style="width: 250px;height: auto">
+    </div>
+
+</div>

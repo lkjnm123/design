@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>商品详情页面</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html,body{
+        height: 100%;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    .mainpage{
+        width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .middle{
+        width: 100%;
+        height:800px;
+    }
+    .footer {
+        display: block;
+        text-align: center;
+        bottom: 10px;
+        left: 50%;
+        height: 30px;
+        margin-top: 10px;
+    }
+</style>
+<script src="/js/jquery-1.12.4.js"></script>
+<script>
+    $(function(){
+        $(".addToCart").click(function(){
+            var cartitemid = "0";
+            var thisbutton = $(this);
+            var goodid = $(this).attr("goodid");
+            console.log("添加" + goodid + "到购物车");
+            $.ajax({
+                url: "/client/customer/addcart",
+                type: "post",
+                contentType: "application/json;charset=UTF-8",
+                data: JSON.stringify({
+                    "cartitemid": cartitemid,
+                    "goodid": goodid
+                }),
+                dataType: "json",
+                success: function (data, status) {
+                    if (data.msg === "success") {
+                        alert("添加到购物车成功");
+                        thisbutton.text("已在购物车中");
+                        thisbutton.css("background-color","#7a7e83");
+                        thisbutton.prop("disabled", "disabled");
+                    } else {
+                        alert("添加到购物车失败");
+                    }
+                },
+                error: function (status) {
+                    alert(status);
+                }
+            });
+        })
+    });
+</script>
+<body>
+<div class="mainpage">
+    <div class="header" style="height:50px;display: block;">
+        <div class="searchbox" style="float: left;margin-top: 10px;margin-left: 30%;">
+            <form style="top:50%" th:action="@{/searchGoodByShopId}">
+                <input type="hidden" name="shopid" th:value="${shopid}" style="display:inline;">
+                <input type="text" name="keyword" style="display:inline;width:300px;height:20px;border:3px solid #FF4400" id="keyword">
+                <input type="submit" value="搜本店" style="vertical-align:middle;display:inline;border:0;height:26px;width:45px;background: #FF4400;color: #FFF;">
+            </form>
+        </div>
+        <div class="bar" style="display:inline;float: right;">
+            <span><a style="text-decoration: none;color:#999999" th:href="@{/client/customer/cartlist}">我的购物车</a></span>
+            <span>|</span>
+            <span><a href="../../client/profile.html" style="text-decoration: none;color:#999999">个人资料</a></span>
+            <span>|</span>
+            <span><a href="../../index.html" style="text-decoration: none;color:#999999">返回首页</a></span>
+        </div>
+    </div>
+    <div class="middle" style="clear: both;">
+        <div class="leftbar" style="display: inline;float: left;;width:450px;height:500px;text-align: center;border:1px solid #EEEEEE">
+            <img style="width:400px;display: inline;margin-top: 10%;" th:src="${image}">
+        </div>
+        <div class="rightbar" style="display: inline;width:500px; float: left;margin-left:25px">
+            <p style="height:50px;"><strong>品名</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="goodname" th:text="${goodname}"></span></strong></p>
+            <p style="height:100px;"><strong>描述</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="gooddesc" th:text="${introduce}"></span></strong></p>
+            <p style="height:50px;"><strong>价格</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span style="color:#E4393C;" class="goodprice" th:text="${price}"></span></p>
+            <div style="height: 50px;">
+                <p style="display:inline;"><strong>配送地址</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <select >
+                        <!--//TODO 根据用户id 查询地址列表填充 select-->
+                        <option th:each="address:${addresslist}" th:value="${address.addressid}" th:text="${address.address}"></option>
+                    </select></p>
+                <br>
+            </div>
+            <span style="display:inline;color:green;" th:if="${status==1}">有货</span>
+            <span style="display:inline;color:red;" th:if="${status}==0">无货</span>
+            <p style="height: 50px;"><strong>重量</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span th:text="${weight}"></span></p>
+            <p style="height:100px;"><strong>规格</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span>无</span></p>
+            <p><button th:attr="goodid=${goodid}" class="addToCart" style="height:46px;width:92px;background: #DF3033;color:#FFFFFF;border:0;"><strong>加入购物车</strong></button></p>
+        </div>
+    </div>
+    <div>
+        <p>商品评价</p>
+        <div th:each="comment:${comments}" style="border: 1px solid #EEEEEE">
+            <p th:text="${comment.username}"></p>
+            <p th:text="${comment.comment}"></p>
+        </div>
+    </div>
+    <br>
+    <div>
+        <h4><a th:href="@{/shopinfo(shopid=${shopid})}">进店逛逛</a></h4>
+    </div>
+    <hr>
+    <div class="footer">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+<head>
+    <meta charset="UTF-8">
+    <title>店铺详情页面</title>
+</head>
+<style type="text/css">
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    html,body{
+        height: 100%;
+    }
+    a{
+        text-decoration: none;
+    }
+    .mainpage{
+        width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .middle{
+        width: 100%;
+        height:800px;
+        border:1px solid #EEEEEE;
+    }
+    .footer {
+        display: block;
+        text-align: center;
+        bottom: 10px;
+        left: 50%;
+        height: 30px;
+        margin-top: 10px;
+    }
+</style>
+<script src="/js/jquery-1.12.4.js"></script>
+<script></script>
+<body>
+<div class="mainpage">
+    <div class="header" style="height:auto;display: block;">
+        <img style="width:150px;height:150px;float: left;" th:src="@{/images/e-commerce_transparent.png}">
+        <!--
+        <div class="searchbox" style="float: left;margin-top: 5%;margin-left: 30%;">
+        </div>
+        -->
+        <div class="title" style="float: left;margin-top: 5%;margin-left: 30%;">
+            <h4 th:text="${shopname}"></h4>
+        </div>
+        <div class="bar" style="display:inline;float: right;">
+            <span><a href="../../client/profile.html" style="text-decoration: none;color:#999999">个人资料</a></span>
+            <span>|</span>
+            <span><a href="../../index.html" style="text-decoration: none;color:#999999">返回首页</a></span>
+        </div>
+    </div>
+    <div class="middle" style="clear: both;">
+        <div id="goodList" th:each="good:${goods}">
+            <div class="gooditem" style="display: inline-block;float:left">
+                <a th:href="@{/goodinfo(goodid=${good.goodid})}"><img style="width:232px;height:300px;" th:src="${good.image}"></a>
+                <p><a th:href="@{/goodinfo(goodid=${good.goodid})}"><span th:text="${good.goodname}"></span></a></p>
+                <p><a th:href="@{/goodinfo(goodid=${good.goodid})}"><span th:text="${good.price}"></span></a></p>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="footer">
+        <div style="float: right;">
+            <p style="display: inline;"><a href="../../about.html">关于网站</a></p><span>&nbsp;&nbsp;|&nbsp;&nbsp;</span>
+            <p style="display: inline;">投诉与建议:<a href="mailto:1812430893@qq.com">1812430893@qq.com</a></p>
+        </div>
+        <br>
+        <a style="color:#000" href="https://beian.miit.gov.cn/" target="_blank">鲁ICP备2021006747号</a>
+    </div>
+</div>
+
+</body>
+</html>

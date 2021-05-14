@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>支付成功</title>
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}"/>
+</head>
+<body>
+    <span>订单号：</span>
+    <h4 th:text="${out_trade_no}"></h4>
+    <div><h4><a style="text-decoration: none;color:black;cursor: pointer;"href="../index.html">支付成功，点我返回首页</a></h4></div>
+</body>
+</html>

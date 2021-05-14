@@ -1,0 +1,59 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+    }
+    a{
+        text-decoration: none;
+        color:black;
+    }
+    a:hover{
+        color: red;
+    }
+</style>
+<body>
+<div class="mainpage" style="width:auto;">
+    <div class="gooditem" style="border:1px solid #E5E5E5" th:each="goodShow:${goodShows}">
+        <div class="head" style="height:24px;background-color: #F5F5F5;width:100%;">
+            <p class="date" style="display:inline;font-size: 16px;margin-left: 20px;" th:text="${goodShow.date}"></p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <span style="font-size: 16px;">订单号:&nbsp;&nbsp;</span>
+            <p class="ordernumber" style="display:inline;font-size: 16px;">
+                <a th:href="@{/client/customer/orderInfo(ordernumber=${goodShow.ordernumber})}"><span th:text="${goodShow.ordernumber}"></span></a>
+            </p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="shopname" style="display:inline;font-size: 16px;">
+                <a th:href="@{/shopinfo(shopid=${goodShow.shopid})}"><span th:text="${goodShow.shopname}"></span></a>
+            </p>
+        </div>
+        <div class="body">
+            <img th:src="${goodShow.goodimage}" class="goodimage" style="width:60px;height:60px;margin-left: 20px;">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="goodname"  style="display:inline;vertical-align: top;" th:text="${goodShow.goodname}"></p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="goodnumber" style="display:inline;vertical-align: top;">×<span th:text="${goodShow.buynumber}"></span></p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="consignee" style="display:inline;vertical-align: top;width: 100px;overflow: hidden;" th:text="${goodShow.consignee}"></p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="payamount" style="display:inline;vertical-align: top;">价格到订单信息中查看</p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="status" style="display:inline;vertical-align: top;">
+                <span th:if="${goodShow.goodstatus}==0">待发货</span>
+                <span th:if="${goodShow.goodstatus}==1">运输中</span>
+                <span th:if="${goodShow.goodstatus}==2">配送中</span>
+                <span th:if="${goodShow.goodstatus}==3">待评价</span>
+                <span th:if="${goodShow.goodstatus}==4">已完成</span>
+                <span th:if="${goodShow.goodstatus}==9">已退款</span>
+            </p>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <p class="opeartion" style="display:inline;vertical-align: top;">
+                <button th:if="${goodShow.goodstatus==2}" class="confirmReceipt" th:attr="ordercustomerid=${goodShow.ordercustomerid},orderitemid=${goodShow.orderitemid},goodname=${goodShow.goodname},shopname=${goodShow.shopname}">确认收货</button>
+                <button th:if="${goodShow.goodstatus==3}" class="toEvaluate" th:attr="ordercustomerid=${goodShow.ordercustomerid},orderitemid=${goodShow.orderitemid},goodname=${goodShow.goodname},shopname=${goodShow.shopname}">去评价</button>
+                <button th:if="${goodShow.goodstatus==0}" class="refund" th:attr="outordernumber=${goodShow.ordernumber}">退款</button>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>
