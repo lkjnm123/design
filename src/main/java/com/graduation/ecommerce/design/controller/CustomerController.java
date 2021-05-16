@@ -36,6 +36,11 @@ public class CustomerController {
 
     @RequestMapping(value="/searchgood",method = {RequestMethod.POST,RequestMethod.GET})
     public String searchGood(@RequestParam String keyname,Map<String,Object> map,Model model,HttpSession httpSession){
+        String identity = (String)httpSession.getAttribute("identity");
+        if(identity.equals("business")){
+            map.put("msg","暂未支持商家角色搜索商品");
+            return "/search";
+        }
         Collection<Good> goodList = customerService.findGoodByKeyword(keyname);
         Collection<Good> goodResult = new ArrayList<>();
         Collection<GoodView> goodViews = new ArrayList<>();
@@ -52,6 +57,7 @@ public class CustomerController {
          *     private int shopid;
          *     private String shopname;
          */
+
         String sessionCustomerId = (String)httpSession.getAttribute("customerId");
         int customerid = Integer.parseInt(sessionCustomerId);
         Collection<CartItem> cartItemList = customerService.findCartItemListByCustomerId(customerid);

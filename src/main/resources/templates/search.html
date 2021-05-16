@@ -69,6 +69,7 @@
         //TODO 商品分页
         //TODO 搜索得到的商品列表 按照价格区间、销量、新品进行排序
         -->
+        <p th:text="${msg}" style="color:red;"></p>
         <div class="gooditem" th:each="good:${goodViews}">
             <a th:href="@{/goodinfo(goodid=${good.goodid})}"><img th:src="${good.goodimage}"
                                                                   th:attr="goodid=${good.goodid}"
